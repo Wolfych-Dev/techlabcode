@@ -44,7 +44,6 @@ body {
   height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
 }
 
-
 .header {
   background: var(--panel); padding: 6px 8px; gap: 4px;
   display: flex; flex-wrap: nowrap; align-items: center;
@@ -74,7 +73,6 @@ body {
 .sim-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: all 0.3s; }
 .sim-indicator.on { background: var(--wire-on); box-shadow: 0 0 8px var(--wire-on); animation: pulse 1s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-
 
 .workspace {
   flex: 1; display: flex; overflow: hidden; min-height: 0;
@@ -114,11 +112,9 @@ body {
 }
 .new-file-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-
 .editor-area {
   flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden;
 }
-
 
 .tabs-bar {
   display: flex; background: var(--panel); border-bottom: 1px solid var(--border);
@@ -143,7 +139,6 @@ body {
 .tab .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--warn); display: none; }
 .tab.modified .dot { display: block; }
 
-
 .editor-wrap {
   flex: 1; display: flex; overflow: hidden; min-height: 0;
   background: var(--code-bg); position: relative;
@@ -154,7 +149,9 @@ body {
   border-right: 1px solid var(--border); user-select: none;
   overflow: hidden; min-width: 48px; flex-shrink: 0;
   line-height: 1.6; padding-right: 10px; padding-left: 10px;
+  display: flex; flex-direction: column;
 }
+.line-nums div { line-height: 1.6; }
 .code-editor {
   flex: 1; position: relative; overflow: hidden; display: flex;
 }
@@ -163,7 +160,7 @@ body {
   background: transparent; color: transparent; caret-color: var(--accent);
   border: none; outline: none; resize: none; font-family: 'Fira Code', 'Share Tech Mono', monospace;
   font-size: 13px; line-height: 1.6; padding: 14px 16px;
-  tab-size: 2; white-space: pre; overflow-wrap: normal; overflow: auto;
+  tab-size: 2; white-space: pre-wrap; overflow-wrap: normal; overflow: auto;
   scrollbar-width: thin; scrollbar-color: var(--border) transparent;
   z-index: 2;
 }
@@ -171,7 +168,7 @@ body {
   position: absolute; inset: 0; pointer-events: none;
   font-family: 'Fira Code', 'Share Tech Mono', monospace;
   font-size: 13px; line-height: 1.6; padding: 14px 16px;
-  white-space: pre; overflow-wrap: normal; overflow: hidden;
+  white-space: pre-wrap; overflow-wrap: normal; overflow: hidden;
   z-index: 1; color: var(--text);
 }
 
@@ -190,6 +187,7 @@ body {
 .unit { color: #f97316; }
 .op  { color: #e2f4ff; }
 
+
 .split-area {
   flex: 1; display: flex; overflow: hidden; min-height: 0;
 }
@@ -207,7 +205,6 @@ body {
   background: var(--panel); border-left: 1px solid var(--border); flex: 0 0 45%;
 }
 .pane-output.hidden { display: none; }
-
 
 .output-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -241,7 +238,6 @@ body {
 .log-line.info { color: var(--accent); }
 .log-line.ok { color: var(--wire-on); }
 .log-prefix { color: var(--muted); margin-right: 6px; }
-
 
 .status-bar {
   background: var(--panel); border-top: 1px solid var(--border);
@@ -279,13 +275,11 @@ body {
 }
 .search-bar .s-count { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--muted); }
 
-
 .minimap {
   width: 80px; background: #010c16; border-left: 1px solid var(--border);
   overflow: hidden; position: relative; cursor: pointer; flex-shrink: 0;
 }
 .minimap canvas { width: 100%; height: 100%; }
-
 
 .welcome {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -303,7 +297,6 @@ body {
 .welcome .sc .sc-key { font-family: 'Share Tech Mono', monospace; color: var(--accent); font-size: 9px; display: block; margin-bottom: 4px; }
 .welcome .sc .sc-name { font-size: 13px; }
 
-
 #ctx-menu {
   position: fixed; background: var(--panel); border: 1px solid var(--border);
   border-radius: 10px; z-index: 9000; display: none; overflow: hidden; min-width: 160px;
@@ -312,7 +305,6 @@ body {
 .ctx-item { padding: 9px 16px; font-size: 12px; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
 .ctx-item:hover { background: var(--panel2); color: var(--accent); }
 .ctx-item .ctx-key { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--muted); }
-
 
 .modal-overlay {
   position: fixed; inset: 0; background: #000a; z-index: 8000; display: none; align-items: center; justify-content: center;
@@ -337,6 +329,16 @@ body {
 }
 
 
+.lang-switcher { display: flex; gap: 2px; align-items: center; flex-shrink: 0; }
+.lang-switch-btn {
+  background: var(--panel2); border: 1px solid var(--border); color: var(--muted);
+  padding: 4px 7px; border-radius: 6px; font-size: 10px; font-weight: 700;
+  font-family: 'Share Tech Mono', monospace; cursor: pointer; transition: all 0.15s;
+  min-height: 28px; display: flex; align-items: center; gap: 3px;
+}
+.lang-switch-btn:hover { border-color: var(--accent); color: var(--text); }
+.lang-switch-btn.active { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -349,11 +351,11 @@ body {
 <div class="header">
   <span class="logo">tECHLAB <span>CODE</span></span>
   <div class="hgroup">
-    <button class="btn" onclick="showNewFileModal()" title="Новий файл (Ctrl+N)">+ ФАЙЛ</button>
-    <button class="btn" onclick="saveCurrentFile()" title="Зберегти (Ctrl+S)">💾 ЗБЕРЕГ</button>
-    <button class="btn" onclick="openFile()" title="Відкрити">📂 ВІДКР</button>
+    <button class="btn" id="btn-new-file" onclick="showNewFileModal()" title="Новий файл (Ctrl+N)">+ ФАЙЛ</button>
+    <button class="btn" id="btn-save" onclick="saveCurrentFile()" title="Зберегти (Ctrl+S)">💾 ЗБЕРЕГ</button>
+    <button class="btn" id="btn-open" onclick="openFile()" title="Відкрити">📂 ВІДКР</button>
     <input type="file" id="open-file-input" style="display:none" onchange="doOpenFile(event)">
-    <button class="btn" onclick="exportFile()" title="Скачати поточний файл">⬇ СКАЧАТИ</button>
+    <button class="btn" id="btn-download" onclick="exportFile()" title="Скачати поточний файл">⬇ СКАЧАТИ</button>
   </div>
   <div class="sep"></div>
   <div class="hgroup">
@@ -361,8 +363,8 @@ body {
     <button class="btn" id="btn-split" onclick="toggleSplit()" title="Поділити екран">⧉</button>
     <button class="btn" id="btn-minimap" onclick="toggleMinimap()">МІНІМАПА</button>
     <button class="btn" onclick="toggleSearch()" title="Пошук (Ctrl+F)">🔍</button>
-    <button class="btn" onclick="formatCode()" title="Форматувати">≣ ФОРМ</button>
-    <button class="btn" onclick="cycleTheme()">◐ ТЕМА</button>
+    <button class="btn" id="btn-format" onclick="formatCode()" title="Форматувати">≣ ФОРМ</button>
+    <button class="btn" id="btn-theme" onclick="cycleTheme()">◐ ТЕМА</button>
   </div>
   <div class="sep"></div>
   <button class="btn btn-run" id="run-btn" onclick="runCode()">▶ ЗАПУСК</button>
@@ -370,8 +372,14 @@ body {
     <div class="sim-indicator" id="run-dot"></div>
     <span id="run-status">ГОТОВО</span>
   </div>
+  <div class="sep"></div>
+  <div class="lang-switcher" id="lang-switcher">
+    <button class="lang-switch-btn active" onclick="setLang('uk')" id="lbtn-uk">UA</button>
+    <button class="lang-switch-btn" onclick="setLang('ru')" id="lbtn-ru">RU</button>
+    <button class="lang-switch-btn" onclick="setLang('de')" id="lbtn-de">DE</button>
+    <button class="lang-switch-btn" onclick="setLang('en')" id="lbtn-en">EN</button>
+  </div>
 </div>
-
 
 <div class="workspace">
 
@@ -388,17 +396,17 @@ body {
 
   <div class="split-area" id="split-area">
 
-
     <div class="pane-editor" id="pane-editor">
 
 
       <div class="tabs-bar" id="tabs-bar">
-
+ 
       </div>
+
 
       <div id="editor-or-welcome" style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;">
 
-
+    
         <div class="welcome" id="welcome-screen">
           <div class="wlogo">{ CODE }</div>
           <div class="wsub">tECHLAB — СЕРЕДОВИЩЕ ПРОГРАМУВАННЯ</div>
@@ -430,7 +438,7 @@ body {
           </div>
         </div>
 
-  
+
         <div class="editor-wrap" id="editor-wrap" style="display:none;">
           <div class="line-nums" id="line-nums"></div>
           <div class="code-editor" id="code-editor-div">
@@ -440,7 +448,7 @@ body {
           <div class="minimap" id="minimap-pane">
             <canvas id="minimap-canvas"></canvas>
           </div>
-          <!-- SEARCH -->
+
           <div class="search-bar" id="search-bar">
             <input type="text" id="search-input" placeholder="Пошук..." oninput="doSearch()">
             <span class="s-count" id="s-count">0 збігів</span>
@@ -460,6 +468,7 @@ body {
 
 
     <div class="divider h" id="divider" style="display:none" onmousedown="startDividerDrag(event)"></div>
+
 
     <div class="pane-output hidden" id="pane-output">
       <div class="output-header">
@@ -491,7 +500,7 @@ body {
   <div class="ctx-item" onclick="formatCode()">Форматувати <span class="ctx-key">Alt+F</span></div>
 </div>
 
-
+<!-- NEW FILE MODAL -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <h3>// НОВИЙ ФАЙЛ</h3>
@@ -526,7 +535,6 @@ const state = {
   dividerDragging: false,
 };
 
-// Templates
 const TEMPLATES = {
   html: `<!DOCTYPE html>
 <html lang="uk">
@@ -650,7 +658,7 @@ console.log("Hello!");
 
 function highlight(code, lang) {
   if (!code) return '';
-  // Escape HTML first
+
   let s = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
   if (lang === 'html') {
@@ -792,8 +800,10 @@ function doHighlight() {
 function updateLineNums() {
   const ta = document.getElementById('main-ta');
   const ln = document.getElementById('line-nums');
-  const lines = (ta.value.match(/\n/g)||[]).length + 1;
-  ln.textContent = Array.from({length:lines},(_,i)=>i+1).join('\n');
+  const count = (ta.value.match(/\n/g)||[]).length + 1;
+  ln.innerHTML = Array.from({length: count}, (_,i) =>
+    `<div>${i+1}</div>`
+  ).join('');
 }
 
 function updateStatus() {
@@ -804,18 +814,20 @@ function updateStatus() {
   const text = ta.value.substring(0, pos);
   const row = (text.match(/\n/g)||[]).length + 1;
   const col = pos - text.lastIndexOf('\n');
-  document.getElementById('st-pos').textContent = `Рядок ${row}, Стовп ${col}`;
+  const t = I18N[currentLang];
+  document.getElementById('st-pos').textContent = t.lineCol(row, col);
   document.getElementById('st-lang').textContent = file.lang.toUpperCase();
-  document.getElementById('st-chars').textContent = ta.value.length + ' симв.';
-  document.getElementById('st-lines').textContent = ((ta.value.match(/\n/g)||[]).length+1) + ' рядків';
+  document.getElementById('st-chars').textContent = t.chars(ta.value.length);
+  document.getElementById('st-lines').textContent = t.lines((ta.value.match(/\n/g)||[]).length+1);
 }
 
 function markModified() {
   const file = getActive();
+
   if(file && !file.modified) { file.modified = true; renderTabs(); }
 }
 
-// Tab handling, auto-indent
+
 document.addEventListener('DOMContentLoaded', () => {
   const ta = document.getElementById('main-ta');
   ta.addEventListener('input', doHighlight);
@@ -888,6 +900,7 @@ function handleGlobalKey(e) {
   }
 }
 
+
 function toggleMinimap() {
   state.minimapVisible = !state.minimapVisible;
   document.getElementById('minimap-pane').style.display = state.minimapVisible ? '' : 'none';
@@ -934,16 +947,14 @@ function hideSearch() {
 function doSearch() {
   const q = document.getElementById('search-input').value;
   const ta = document.getElementById('main-ta');
-  if(!q) { document.getElementById('s-count').textContent = '0 збігів'; return; }
+  if(!q) { document.getElementById('s-count').textContent = '0 ' + I18N[currentLang].matches; return; }
   const text = ta.value;
   let count = 0, idx = 0;
   while((idx = text.indexOf(q, idx)) !== -1) { count++; idx += q.length; }
-  document.getElementById('s-count').textContent = count + ' збігів';
+  document.getElementById('s-count').textContent = count + ' ' + I18N[currentLang].matches;
 }
 
-// ============================================================
-// CODE ACTIONS
-// ============================================================
+
 function toggleComment() {
   const ta = document.getElementById('main-ta');
   const file = getActive();
@@ -991,17 +1002,15 @@ function formatCode() {
   logLine('ok', 'Код відформатовано');
 }
 
-// ============================================================
-// RUN CODE
-// ============================================================
+
 function runCode() {
   const file = getActive();
   if(!file) { logLine('err','Немає відкритого файлу'); return; }
   openOutput();
   const dot = document.getElementById('run-dot');
   const status = document.getElementById('run-status');
-  dot.classList.add('on'); status.textContent = 'ВИКОНАННЯ...';
-  setTimeout(() => { dot.classList.remove('on'); status.textContent = 'ГОТОВО'; }, 1500);
+  dot.classList.add('on'); status.textContent = I18N[currentLang].running + '...';
+  setTimeout(() => { dot.classList.remove('on'); status.textContent = I18N[currentLang].ready; }, 1500);
 
   if(file.lang === 'html') {
     runHTML(file.content);
@@ -1040,7 +1049,7 @@ function runJS(code, lang) {
   switchOutTab('console');
   clearConsole();
   logLine('info', `▶ Запуск ${lang.toUpperCase()}...`);
-  // Patch console
+
   const frame = document.getElementById('preview-frame');
   const doc = frame.contentDocument;
   const src = `
@@ -1060,7 +1069,7 @@ function runJS(code, lang) {
 }
 
 function stripTS(code) {
-  // Very basic TS stripping - remove type annotations
+ 
   return code
     .replace(/:\s*(string|number|boolean|any|void|never|object|unknown|null|undefined|[\w<>[\]|&,\s]+)(?=[,;){\n=])/g,'')
     .replace(/interface\s+\w+\s*\{[^}]*\}/g,'')
@@ -1090,7 +1099,7 @@ function execLua(code) {
     const { lua, lauxlib, lualib } = fengari;
     const L = lauxlib.luaL_newstate();
     lualib.luaL_openlibs(L);
-    // Override print
+   
     const printFn = (lst) => {
       const out = [];
       for(let i=1;i<=lua.lua_gettop(lst);i++) out.push(lua.lua_tojsstring(lst,i));
@@ -1118,7 +1127,7 @@ function validateJSON(code) {
   }
 }
 
-// Receive messages from iframe
+
 window.addEventListener('message', e => {
   if(e.data && e.data.type) {
     const typeMap = {log:'log', error:'err', warn:'warn'};
@@ -1199,7 +1208,7 @@ function createNewFile() {
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('modal-filename').addEventListener('keydown', e => {
     if(e.key==='Enter') createNewFile();
-    // auto-detect lang from extension
+   
     if(e.key !== 'Enter') {
       const name = e.target.value + e.key;
       const ext = name.split('.').pop().toLowerCase();
@@ -1217,11 +1226,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+
 function newFileTemplate(lang) {
   const ext = {html:'html',css:'css',js:'js',ts:'ts',lua:'lua',json:'json',md:'md'}[lang]||'txt';
   const name = 'untitled.'+ext;
   createFile(name, lang);
 }
+
 
 function saveCurrentFile() {
   const file = getActive();
@@ -1230,8 +1241,8 @@ function saveCurrentFile() {
   file.modified = false;
   renderTabs();
   try { localStorage.setItem('techlab_code_'+file.id, JSON.stringify(file)); } catch(e){}
-  logLine('ok', `Збережено: ${file.name}`);
-  // Also save to LS
+  logLine('ok', I18N[currentLang].saved(file.name));
+
   autoSave();
 }
 
@@ -1248,10 +1259,20 @@ function exportFile() {
   const file = getActive();
   if(!file) return;
   const content = document.getElementById('main-ta').value;
+  const extMap = {html:'html',css:'css',js:'js',ts:'ts',json:'json',lua:'lua',md:'md'};
+  const ext = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : (file.lang || 'txt');
+  const baseName = file.name.includes('.') ? file.name.replace(/\.[^.]+$/, '') : file.name;
+  const fullName = baseName + '.' + (extMap[ext] || ext);
+
+  const encoded = encodeURIComponent(content);
+  const uri = 'data:application/octet-stream;charset=utf-8,' + encoded;
   const a = document.createElement('a');
-  a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
-  a.download = file.name;
+  a.style.display = 'none';
+  a.href = uri;
+  a.download = fullName;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
 }
 
 function openFile() { document.getElementById('open-file-input').click(); }
@@ -1265,6 +1286,7 @@ function doOpenFile(e) {
   reader.readAsText(f);
   e.target.value = '';
 }
+
 
 function ctxCut() { document.execCommand('cut'); }
 function ctxCopy() { document.execCommand('copy'); }
@@ -1291,6 +1313,7 @@ function cycleTheme() {
   updateMinimap();
 }
 
+
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem('techlab_code_state')||'{}');
@@ -1312,15 +1335,202 @@ function loadState() {
 
 document.addEventListener('DOMContentLoaded', () => {
   if(!loadState()) {
- 
+
     createFile('index.html', 'html', TEMPLATES.html);
   }
 
   document.getElementById('btn-tree').classList.add('active');
   updateMinimap();
-
+ 
   document.getElementById('main-ta').addEventListener('input', autoSave);
+
+  try {
+    const savedLang = localStorage.getItem('techlab_lang');
+    if(savedLang && I18N[savedLang]) setLang(savedLang);
+  } catch(e){}
 });
+
+
+const I18N = {
+  uk: {
+    newFile: '+ ФАЙЛ', save: '💾', open: '📂', download: '⬇ СКАЧАТИ',
+    minimap: 'МІНІМАПА', format: '≣ ФОРМ', theme: '◐ ТЕМА', run: '▶ ЗАПУСК',
+    ready: 'ГОТОВО', running: 'ЗАПУЩЕНО', done: 'ВИКОНАНО', error: 'ПОМИЛКА',
+    files: 'ФАЙЛИ', newFilePlus: '+ Новий файл',
+    preview: 'ПРЕВʼЮ', console: 'КОНСОЛЬ', clear: 'ОЧИСТ',
+    search: 'Пошук...', matches: 'збігів',
+    lineCol: (l,c) => `Рядок ${l}, Стовп ${c}`,
+    chars: n => `${n} симв.`, lines: n => `${n} рядків`,
+    cut: 'Вирізати', copy: 'Копіювати', paste: 'Вставити', selectAll: 'Вибрати все',
+    comment: 'Коментар', duplicate: 'Дублювати рядок', formatCtx: 'Форматувати',
+    modalTitle: '// НОВИЙ ФАЙЛ', filenamePlaceholder: 'Назва файлу (напр. index.html)',
+    cancel: 'Скасувати', create: 'Створити',
+    newHtml: 'Новий HTML файл', newCss: 'Новий CSS файл', newJs: 'Новий JS файл',
+    newTs: 'Новий TS файл', newLua: 'Новий Lua файл', newJson: 'Новий JSON файл',
+    envTitle: 'tECHLAB — СЕРЕДОВИЩЕ ПРОГРАМУВАННЯ',
+    saved: f => `Збережено: ${f}`,
+  },
+  ru: {
+    newFile: '+ ФАЙЛ', save: '💾', open: '📂', download: '⬇ СКАЧАТЬ',
+    minimap: 'МИНИМАПА', format: '≣ ФОРМ', theme: '◐ ТЕМА', run: '▶ ЗАПУСК',
+    ready: 'ГОТОВО', running: 'ЗАПУЩЕНО', done: 'ВЫПОЛНЕНО', error: 'ОШИБКА',
+    files: 'ФАЙЛЫ', newFilePlus: '+ Новый файл',
+    preview: 'ПРЕВЬЮ', console: 'КОНСОЛЬ', clear: 'ОЧИСТ',
+    search: 'Поиск...', matches: 'совпад.',
+    lineCol: (l,c) => `Строка ${l}, Столб ${c}`,
+    chars: n => `${n} симв.`, lines: n => `${n} строк`,
+    cut: 'Вырезать', copy: 'Копировать', paste: 'Вставить', selectAll: 'Выбрать всё',
+    comment: 'Комментарий', duplicate: 'Дублировать строку', formatCtx: 'Форматировать',
+    modalTitle: '// НОВЫЙ ФАЙЛ', filenamePlaceholder: 'Имя файла (напр. index.html)',
+    cancel: 'Отмена', create: 'Создать',
+    newHtml: 'Новый HTML файл', newCss: 'Новый CSS файл', newJs: 'Новый JS файл',
+    newTs: 'Новый TS файл', newLua: 'Новый Lua файл', newJson: 'Новый JSON файл',
+    envTitle: 'tECHLAB — СРЕДА ПРОГРАММИРОВАНИЯ',
+    saved: f => `Сохранено: ${f}`,
+  },
+  de: {
+    newFile: '+ DATEI', save: '💾', open: '📂', download: '⬇ LADEN',
+    minimap: 'MINIMAP', format: '≣ FORMAT', theme: '◐ DESIGN', run: '▶ AUSFÜHR',
+    ready: 'BEREIT', running: 'LÄUFT', done: 'FERTIG', error: 'FEHLER',
+    files: 'DATEIEN', newFilePlus: '+ Neue Datei',
+    preview: 'VORSCH.', console: 'KONSOLE', clear: 'LEEREN',
+    search: 'Suchen...', matches: 'Treffer',
+    lineCol: (l,c) => `Zeile ${l}, Sp. ${c}`,
+    chars: n => `${n} Zeich.`, lines: n => `${n} Zeilen`,
+    cut: 'Ausschneiden', copy: 'Kopieren', paste: 'Einfügen', selectAll: 'Alles wählen',
+    comment: 'Kommentar', duplicate: 'Zeile duplizieren', formatCtx: 'Formatieren',
+    modalTitle: '// NEUE DATEI', filenamePlaceholder: 'Dateiname (z.B. index.html)',
+    cancel: 'Abbrechen', create: 'Erstellen',
+    newHtml: 'Neue HTML-Datei', newCss: 'Neue CSS-Datei', newJs: 'Neue JS-Datei',
+    newTs: 'Neue TS-Datei', newLua: 'Neue Lua-Datei', newJson: 'Neue JSON-Datei',
+    envTitle: 'tECHLAB — ENTWICKLUNGSUMGEBUNG',
+    saved: f => `Gespeichert: ${f}`,
+  },
+  en: {
+    newFile: '+ FILE', save: '💾', open: '📂', download: '⬇ DOWNLOAD',
+    minimap: 'MINIMAP', format: '≣ FORMAT', theme: '◐ THEME', run: '▶ RUN',
+    ready: 'READY', running: 'RUNNING', done: 'DONE', error: 'ERROR',
+    files: 'FILES', newFilePlus: '+ New File',
+    preview: 'PREVIEW', console: 'CONSOLE', clear: 'CLEAR',
+    search: 'Search...', matches: 'matches',
+    lineCol: (l,c) => `Line ${l}, Col ${c}`,
+    chars: n => `${n} chars`, lines: n => `${n} lines`,
+    cut: 'Cut', copy: 'Copy', paste: 'Paste', selectAll: 'Select All',
+    comment: 'Comment', duplicate: 'Duplicate Line', formatCtx: 'Format',
+    modalTitle: '// NEW FILE', filenamePlaceholder: 'File name (e.g. index.html)',
+    cancel: 'Cancel', create: 'Create',
+    newHtml: 'New HTML File', newCss: 'New CSS File', newJs: 'New JS File',
+    newTs: 'New TS File', newLua: 'New Lua File', newJson: 'New JSON File',
+    envTitle: 'tECHLAB — CODING ENVIRONMENT',
+    saved: f => `Saved: ${f}`,
+  }
+};
+
+let currentLang = 'uk';
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = I18N[lang];
+
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if(t[key] !== undefined && typeof t[key] === 'string') el.textContent = t[key];
+  });
+
+
+  ['uk','ru','de','en'].forEach(l => {
+    const b = document.getElementById('lbtn-'+l);
+    if(b) b.classList.toggle('active', l === lang);
+  });
+
+
+  const ids = {
+    'btn-new-file': 'newFile', 'btn-save': 'save', 'btn-open': 'open',
+    'btn-download': 'download', 'btn-minimap': 'minimap', 'btn-format': 'format',
+    'btn-theme': 'theme', 'run-btn': 'run',
+  };
+  Object.entries(ids).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = t[key];
+  });
+
+
+  const rs = document.getElementById('run-status');
+  if(rs && (rs.textContent === I18N.uk.ready || rs.textContent === I18N.ru.ready || rs.textContent === I18N.de.ready || rs.textContent === I18N.en.ready)) {
+    rs.textContent = t.ready;
+  }
+
+
+  const th = document.querySelector('.tree-header span');
+  if(th) th.textContent = t.files;
+
+
+  const nfb = document.querySelector('.new-file-btn');
+  if(nfb) nfb.textContent = t.newFilePlus;
+
+
+  const otPrev = document.getElementById('ot-preview');
+  const otCons = document.getElementById('ot-console');
+  if(otPrev) otPrev.textContent = t.preview;
+  if(otCons) otCons.textContent = t.console;
+
+
+  const clearBtn = document.querySelector('[onclick="clearConsole()"]');
+  if(clearBtn) clearBtn.textContent = t.clear;
+
+ 
+  const si = document.getElementById('search-input');
+  if(si) si.placeholder = t.search;
+
+ 
+  const sc = document.getElementById('s-count');
+  if(sc) { const m = sc.textContent.match(/\d+/); if(m) sc.textContent = `${m[0]} ${t.matches}`; }
+
+
+  updateStatusBarI18n();
+
+ 
+  const ctxItems = document.querySelectorAll('#ctx-menu .ctx-item');
+  if(ctxItems.length >= 7) {
+    const keys = [t.cut, t.copy, t.paste, t.selectAll, t.comment, t.duplicate, t.formatCtx];
+    const shortcuts = ['Ctrl+X','Ctrl+C','Ctrl+V','Ctrl+A','Ctrl+/','Ctrl+D','Alt+F'];
+    ctxItems.forEach((el, i) => {
+      if(keys[i]) el.innerHTML = `${keys[i]} <span class="ctx-key">${shortcuts[i]}</span>`;
+    });
+  }
+
+ 
+  const mh = document.querySelector('.modal h3');
+  if(mh) mh.textContent = t.modalTitle;
+  const mfn = document.getElementById('modal-filename');
+  if(mfn) mfn.placeholder = t.filenamePlaceholder;
+  const cancelBtn = document.querySelector('[onclick="closeModal()"]');
+  if(cancelBtn) cancelBtn.textContent = t.cancel;
+  const createBtn = document.querySelector('[onclick="createNewFile()"]');
+  if(createBtn) createBtn.textContent = t.create;
+
+
+  const scNames = document.querySelectorAll('.welcome .sc .sc-name');
+  const nameKeys = ['newHtml','newCss','newJs','newTs','newLua','newJson'];
+  scNames.forEach((el, i) => { if(nameKeys[i]) el.textContent = t[nameKeys[i]]; });
+
+
+  const wsub = document.querySelector('.welcome .wsub');
+  if(wsub) wsub.textContent = t.envTitle;
+
+
+  try { localStorage.setItem('techlab_lang', lang); } catch(e){}
+}
+
+function updateStatusBarI18n() {
+  const t = I18N[currentLang];
+
+  const stChars = document.getElementById('st-chars');
+  const stLines = document.getElementById('st-lines');
+  if(stChars) { const m = stChars.textContent.match(/\d+/); if(m) stChars.textContent = t.chars(m[0]); }
+  if(stLines) { const m = stLines.textContent.match(/\d+/); if(m) stLines.textContent = t.lines(m[0]); }
+}
 
 window.addEventListener('beforeunload', autoSave);
 </script>
