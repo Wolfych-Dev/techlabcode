@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>tECHLAB CODE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Fira+Code:wght@300;400;500&display=swap');
+:root {
+  --bg: #030712; --panel: #0d1b2a; --panel2: #112240;
+  --accent: #00d4ff; --accent2: #7c3aed; --wire-on: #00ff88;
+  --danger: #ff3b3b; --warn: #ffbe0b; --text: #e2f4ff;
+  --muted: #4a7a99; --border: #1e3a5f; --grid: #0d1b2a;
+  --glow: 0 0 12px var(--accent); --glow2: 0 0 20px var(--wire-on);
+  --code-bg: #020b14;
+  --line-num: #1e3a5f;
+}
+[data-theme="light"] {
+  --bg: #f0f4f8; --panel: #dde8f0; --panel2: #c8d9e8;
+  --accent: #0077aa; --accent2: #6d28d9; --wire-on: #007a3d;
+  --danger: #cc1111; --warn: #c08000; --text: #0d1b2a;
+  --muted: #446688; --border: #a0b8cc; --grid: #d0dce8;
+  --code-bg: #e8f0f8;
+}
+[data-theme="retro"] {
+  --bg: #0a0800; --panel: #1a1500; --panel2: #251f00;
+  --accent: #ffcc00; --accent2: #ff6600; --wire-on: #aaff00;
+  --danger: #ff2200; --warn: #ff9900; --text: #ffe080;
+  --muted: #806040; --border: #403010; --grid: #141000;
+  --code-bg: #070600;
+}
+[data-theme="neon"] {
+  --bg: #0a000f; --panel: #140020; --panel2: #1e0030;
+  --accent: #ff00ff; --accent2: #00ffff; --wire-on: #ff00aa;
+  --danger: #ff3300; --warn: #ffaa00; --text: #ffccff;
+  --muted: #884488; --border: #330055; --grid: #0f000f;
+  --code-bg: #06000c;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Rajdhani', system-ui, sans-serif;
+  height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
+}
+
+
+.header {
+  background: var(--panel); padding: 6px 8px; gap: 4px;
+  display: flex; flex-wrap: nowrap; align-items: center;
+  border-bottom: 2px solid var(--border); z-index: 1000;
+  min-height: 48px; overflow-x: auto;
+  scrollbar-width: none;
+}
+.header::-webkit-scrollbar { display: none; }
+.logo { font-family: 'Share Tech Mono', monospace; color: var(--accent); font-size: 13px; font-weight: bold; padding: 0 10px 0 4px; letter-spacing: 1px; white-space: nowrap; }
+.logo span { color: var(--wire-on); }
+.hgroup { display: flex; gap: 4px; flex-shrink: 0; }
+.btn {
+  background: var(--panel2); border: 1px solid var(--border); color: var(--muted);
+  padding: 6px 10px; border-radius: 8px; font-size: 10px; font-weight: 700;
+  font-family: 'Rajdhani', sans-serif; letter-spacing: 0.5px; cursor: pointer;
+  transition: all 0.15s; white-space: nowrap; min-height: 34px; display: flex; align-items: center; justify-content: center;
+  border: none; outline: none;
+}
+.btn:hover { border: 1px solid var(--accent); color: var(--text); background: var(--panel2); }
+.btn.active { background: var(--accent); color: #000; box-shadow: var(--glow); border: 1px solid var(--accent); }
+.btn-run { background: #003a1a; border: 1px solid var(--wire-on) !important; color: var(--wire-on); }
+.btn-run:hover { background: #00541f; }
+.btn-run.on { background: var(--wire-on); color: #000; box-shadow: var(--glow2); }
+.btn-danger { background: #3a0000; border: 1px solid var(--danger) !important; color: var(--danger); }
+.sep { width: 1px; height: 28px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
+.info-bar { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--muted); display: flex; gap: 10px; align-items: center; padding: 0 6px; white-space: nowrap; }
+.sim-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: all 0.3s; }
+.sim-indicator.on { background: var(--wire-on); box-shadow: 0 0 8px var(--wire-on); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+
+.workspace {
+  flex: 1; display: flex; overflow: hidden; min-height: 0;
+}
+
+.file-tree {
+  width: 200px; background: var(--panel); border-right: 2px solid var(--border);
+  display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
+  transition: width 0.2s;
+}
+.file-tree.collapsed { width: 0; border-right: none; }
+.tree-header {
+  padding: 8px 10px; font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  color: var(--muted); border-bottom: 1px solid var(--border);
+  font-family: 'Share Tech Mono', monospace; display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+.tree-scroll { flex: 1; overflow-y: auto; padding: 6px 0; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.tree-item {
+  padding: 5px 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  color: var(--muted); font-family: 'Rajdhani', sans-serif; font-weight: 600;
+  border-left: 3px solid transparent; transition: all 0.1s;
+}
+.tree-item:hover { background: var(--panel2); color: var(--text); }
+.tree-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--panel2); }
+.tree-item .ext { font-size: 9px; padding: 1px 4px; border-radius: 3px; font-family: 'Share Tech Mono', monospace; }
+.ext-html { background: #7c1d1d; color: #fca5a5; }
+.ext-css  { background: #1d4ed8; color: #93c5fd; }
+.ext-js   { background: #713f12; color: #fde68a; }
+.ext-ts   { background: #1e3a5f; color: #7dd3fc; }
+.ext-lua  { background: #4c1d95; color: #c4b5fd; }
+.ext-json { background: #14532d; color: #86efac; }
+.new-file-btn {
+  margin: 8px; padding: 6px; border: 1px dashed var(--border); border-radius: 8px;
+  text-align: center; font-size: 10px; color: var(--muted); cursor: pointer;
+  font-family: 'Share Tech Mono', monospace; transition: all 0.15s;
+}
+.new-file-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+
+.editor-area {
+  flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden;
+}
+
+
+.tabs-bar {
+  display: flex; background: var(--panel); border-bottom: 1px solid var(--border);
+  overflow-x: auto; scrollbar-width: none; flex-shrink: 0;
+}
+.tabs-bar::-webkit-scrollbar { display: none; }
+.tab {
+  display: flex; align-items: center; gap: 6px; padding: 0 14px;
+  height: 36px; font-size: 11px; font-weight: 600; cursor: pointer;
+  color: var(--muted); border-right: 1px solid var(--border);
+  white-space: nowrap; flex-shrink: 0; font-family: 'Rajdhani', sans-serif;
+  border-bottom: 2px solid transparent; transition: all 0.1s;
+}
+.tab:hover { color: var(--text); background: var(--panel2); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--code-bg); }
+.tab .tab-close {
+  width: 16px; height: 16px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; opacity: 0; transition: opacity 0.1s; background: var(--panel2);
+}
+.tab:hover .tab-close, .tab.active .tab-close { opacity: 1; }
+.tab .tab-close:hover { background: var(--danger); color: #fff; }
+.tab .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--warn); display: none; }
+.tab.modified .dot { display: block; }
+
+
+.editor-wrap {
+  flex: 1; display: flex; overflow: hidden; min-height: 0;
+  background: var(--code-bg); position: relative;
+}
+.line-nums {
+  padding: 14px 0; text-align: right; font-family: 'Share Tech Mono', monospace;
+  font-size: 13px; color: var(--line-num); background: var(--code-bg);
+  border-right: 1px solid var(--border); user-select: none;
+  overflow: hidden; min-width: 48px; flex-shrink: 0;
+  line-height: 1.6; padding-right: 10px; padding-left: 10px;
+}
+.code-editor {
+  flex: 1; position: relative; overflow: hidden; display: flex;
+}
+.code-editor textarea {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  background: transparent; color: transparent; caret-color: var(--accent);
+  border: none; outline: none; resize: none; font-family: 'Fira Code', 'Share Tech Mono', monospace;
+  font-size: 13px; line-height: 1.6; padding: 14px 16px;
+  tab-size: 2; white-space: pre; overflow-wrap: normal; overflow: auto;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  z-index: 2;
+}
+.code-editor .highlight {
+  position: absolute; inset: 0; pointer-events: none;
+  font-family: 'Fira Code', 'Share Tech Mono', monospace;
+  font-size: 13px; line-height: 1.6; padding: 14px 16px;
+  white-space: pre; overflow-wrap: normal; overflow: hidden;
+  z-index: 1; color: var(--text);
+}
+
+
+.kw { color: #7c3aed; font-style: italic; }
+.kw2 { color: #c084fc; }
+.str { color: #22c55e; }
+.num { color: #f97316; }
+.cmt { color: #4a7a99; font-style: italic; }
+.fn { color: #38bdf8; }
+.tag { color: #f87171; }
+.attr { color: #fbbf24; }
+.sel { color: #a78bfa; }
+.prop { color: #38bdf8; }
+.val { color: #22c55e; }
+.unit { color: #f97316; }
+.op  { color: #e2f4ff; }
+
+.split-area {
+  flex: 1; display: flex; overflow: hidden; min-height: 0;
+}
+.split-area.vertical { flex-direction: column; }
+.pane-editor { flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; }
+.divider {
+  background: var(--border); cursor: col-resize; flex-shrink: 0;
+  transition: background 0.15s;
+}
+.divider:hover, .divider.dragging { background: var(--accent); }
+.divider.h { width: 4px; cursor: col-resize; }
+.divider.v { height: 4px; cursor: row-resize; }
+.pane-output {
+  display: flex; flex-direction: column; min-height: 0; min-width: 0;
+  background: var(--panel); border-left: 1px solid var(--border); flex: 0 0 45%;
+}
+.pane-output.hidden { display: none; }
+
+
+.output-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 10px; border-bottom: 1px solid var(--border);
+  font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--muted);
+  flex-shrink: 0;
+}
+.output-tabs { display: flex; gap: 2px; }
+.out-tab {
+  padding: 3px 10px; border-radius: 6px; font-size: 9px; cursor: pointer;
+  font-family: 'Rajdhani', sans-serif; font-weight: 700; color: var(--muted);
+  transition: all 0.15s;
+}
+.out-tab:hover { color: var(--text); }
+.out-tab.active { background: var(--accent2); color: #fff; }
+.preview-frame {
+  flex: 1; width: 100%; border: none; background: #fff;
+  display: block;
+}
+.preview-frame.hidden { display: none; }
+.console-out {
+  flex: 1; overflow-y: auto; padding: 10px 12px;
+  font-family: 'Share Tech Mono', monospace; font-size: 11px; line-height: 1.7;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  background: #010a06;
+}
+.console-out.hidden { display: none; }
+.log-line { color: var(--text); padding: 1px 0; }
+.log-line.err { color: var(--danger); }
+.log-line.warn { color: var(--warn); }
+.log-line.info { color: var(--accent); }
+.log-line.ok { color: var(--wire-on); }
+.log-prefix { color: var(--muted); margin-right: 6px; }
+
+
+.status-bar {
+  background: var(--panel); border-top: 1px solid var(--border);
+  padding: 3px 12px; display: flex; gap: 16px; align-items: center;
+  font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--muted);
+  flex-shrink: 0;
+}
+.status-bar .st-item { display: flex; gap: 4px; align-items: center; }
+.status-bar .st-lang { color: var(--accent); font-weight: bold; }
+.status-bar .st-pos { color: var(--text); }
+.status-bar .st-size { }
+.cursor-blink { display: inline-block; width: 7px; height: 12px; background: var(--accent); animation: cblink 1s step-end infinite; vertical-align: middle; margin-right: 4px; }
+@keyframes cblink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+
+.lang-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 700;
+  cursor: pointer; font-family: 'Share Tech Mono', monospace;
+  border: 1px solid var(--border); transition: all 0.15s;
+}
+.lang-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+
+.search-bar {
+  display: none; position: absolute; top: 8px; right: 12px; z-index: 100;
+  background: var(--panel); border: 1px solid var(--accent); border-radius: 10px;
+  padding: 6px 12px; display: none; gap: 8px; align-items: center;
+  box-shadow: var(--glow);
+}
+.search-bar.visible { display: flex; }
+.search-bar input {
+  background: none; border: none; outline: none; color: var(--text);
+  font-family: 'Share Tech Mono', monospace; font-size: 12px; width: 180px;
+}
+.search-bar .s-count { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--muted); }
+
+
+.minimap {
+  width: 80px; background: #010c16; border-left: 1px solid var(--border);
+  overflow: hidden; position: relative; cursor: pointer; flex-shrink: 0;
+}
+.minimap canvas { width: 100%; height: 100%; }
+
+
+.welcome {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 24px; padding: 40px; text-align: center;
+}
+.welcome .wlogo { font-family: 'Share Tech Mono', monospace; font-size: 42px; color: var(--accent); letter-spacing: 4px; }
+.welcome .wsub { font-family: 'Rajdhani', sans-serif; font-size: 14px; color: var(--muted); letter-spacing: 2px; }
+.welcome .shortcuts { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 480px; }
+.welcome .sc {
+  background: var(--panel2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 16px; font-size: 11px; color: var(--muted); cursor: pointer;
+  font-family: 'Rajdhani', sans-serif; font-weight: 600; transition: all 0.15s; text-align: left;
+}
+.welcome .sc:hover { border-color: var(--accent); color: var(--text); transform: translateY(-2px); }
+.welcome .sc .sc-key { font-family: 'Share Tech Mono', monospace; color: var(--accent); font-size: 9px; display: block; margin-bottom: 4px; }
+.welcome .sc .sc-name { font-size: 13px; }
+
+
+#ctx-menu {
+  position: fixed; background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; z-index: 9000; display: none; overflow: hidden; min-width: 160px;
+  box-shadow: 0 8px 30px #000a;
+}
+.ctx-item { padding: 9px 16px; font-size: 12px; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.ctx-item:hover { background: var(--panel2); color: var(--accent); }
+.ctx-item .ctx-key { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--muted); }
+
+
+.modal-overlay {
+  position: fixed; inset: 0; background: #000a; z-index: 8000; display: none; align-items: center; justify-content: center;
+}
+.modal-overlay.visible { display: flex; }
+.modal {
+  background: var(--panel); border: 2px solid var(--accent); border-radius: 16px;
+  padding: 24px; min-width: 340px; box-shadow: 0 20px 60px #000a, var(--glow);
+}
+.modal h3 { font-family: 'Share Tech Mono', monospace; color: var(--accent); margin-bottom: 16px; }
+.modal input, .modal select {
+  width: 100%; background: var(--panel2); border: 1px solid var(--border);
+  color: var(--text); padding: 10px 12px; border-radius: 8px;
+  font-family: 'Share Tech Mono', monospace; font-size: 13px; margin-bottom: 12px;
+  outline: none;
+}
+.modal input:focus, .modal select:focus { border-color: var(--accent); }
+.modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+.modal-btns button {
+  padding: 8px 20px; border-radius: 8px; border: none; font-weight: 700;
+  font-size: 13px; cursor: pointer; font-family: 'Rajdhani', sans-serif;
+}
+
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+</style>
+</head>
+<body>
+
+
+<div class="header">
+  <span class="logo">tECHLAB <span>CODE</span></span>
+  <div class="hgroup">
+    <button class="btn" onclick="showNewFileModal()" title="Новий файл (Ctrl+N)">+ ФАЙЛ</button>
+    <button class="btn" onclick="saveCurrentFile()" title="Зберегти (Ctrl+S)">💾 ЗБЕРЕГ</button>
+    <button class="btn" onclick="openFile()" title="Відкрити">📂 ВІДКР</button>
+    <input type="file" id="open-file-input" style="display:none" onchange="doOpenFile(event)">
+    <button class="btn" onclick="exportFile()" title="Скачати поточний файл">⬇ СКАЧАТИ</button>
+  </div>
+  <div class="sep"></div>
+  <div class="hgroup">
+    <button class="btn" id="btn-tree" onclick="toggleTree()" title="Файловий менеджер">📁</button>
+    <button class="btn" id="btn-split" onclick="toggleSplit()" title="Поділити екран">⧉</button>
+    <button class="btn" id="btn-minimap" onclick="toggleMinimap()">МІНІМАПА</button>
+    <button class="btn" onclick="toggleSearch()" title="Пошук (Ctrl+F)">🔍</button>
+    <button class="btn" onclick="formatCode()" title="Форматувати">≣ ФОРМ</button>
+    <button class="btn" onclick="cycleTheme()">◐ ТЕМА</button>
+  </div>
+  <div class="sep"></div>
+  <button class="btn btn-run" id="run-btn" onclick="runCode()">▶ ЗАПУСК</button>
+  <div class="info-bar">
+    <div class="sim-indicator" id="run-dot"></div>
+    <span id="run-status">ГОТОВО</span>
+  </div>
+</div>
+
+
+<div class="workspace">
+
+
+  <div class="file-tree" id="file-tree">
+    <div class="tree-header">
+      <span>ФАЙЛИ</span>
+      <span style="cursor:pointer;font-size:14px" onclick="toggleTree()">×</span>
+    </div>
+    <div class="tree-scroll" id="tree-scroll"></div>
+    <div class="new-file-btn" onclick="showNewFileModal()">+ Новий файл</div>
+  </div>
+
+
+  <div class="split-area" id="split-area">
+
+
+    <div class="pane-editor" id="pane-editor">
+
+
+      <div class="tabs-bar" id="tabs-bar">
+
+      </div>
+
+      <div id="editor-or-welcome" style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;">
+
+
+        <div class="welcome" id="welcome-screen">
+          <div class="wlogo">{ CODE }</div>
+          <div class="wsub">tECHLAB — СЕРЕДОВИЩЕ ПРОГРАМУВАННЯ</div>
+          <div class="shortcuts">
+            <div class="sc" onclick="newFileTemplate('html')">
+              <span class="sc-key">HTML</span>
+              <span class="sc-name">Новий HTML файл</span>
+            </div>
+            <div class="sc" onclick="newFileTemplate('css')">
+              <span class="sc-key">CSS</span>
+              <span class="sc-name">Новий CSS файл</span>
+            </div>
+            <div class="sc" onclick="newFileTemplate('js')">
+              <span class="sc-key">JavaScript</span>
+              <span class="sc-name">Новий JS файл</span>
+            </div>
+            <div class="sc" onclick="newFileTemplate('ts')">
+              <span class="sc-key">TypeScript</span>
+              <span class="sc-name">Новий TS файл</span>
+            </div>
+            <div class="sc" onclick="newFileTemplate('lua')">
+              <span class="sc-key">Lua</span>
+              <span class="sc-name">Новий Lua файл</span>
+            </div>
+            <div class="sc" onclick="newFileTemplate('json')">
+              <span class="sc-key">JSON</span>
+              <span class="sc-name">Новий JSON файл</span>
+            </div>
+          </div>
+        </div>
+
+  
+        <div class="editor-wrap" id="editor-wrap" style="display:none;">
+          <div class="line-nums" id="line-nums"></div>
+          <div class="code-editor" id="code-editor-div">
+            <div class="highlight" id="highlight-layer"></div>
+            <textarea id="main-ta" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+          </div>
+          <div class="minimap" id="minimap-pane">
+            <canvas id="minimap-canvas"></canvas>
+          </div>
+          <!-- SEARCH -->
+          <div class="search-bar" id="search-bar">
+            <input type="text" id="search-input" placeholder="Пошук..." oninput="doSearch()">
+            <span class="s-count" id="s-count">0 збігів</span>
+            <button class="btn" onclick="hideSearch()" style="padding:3px 8px;min-height:unset;font-size:10px;">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-bar" id="status-bar">
+        <div class="st-item"><span class="cursor-blink"></span><span class="st-pos" id="st-pos">Рядок 1, Стовп 1</span></div>
+        <div class="st-item"><span class="st-lang" id="st-lang">—</span></div>
+        <div class="st-item"><span id="st-chars">0 симв.</span></div>
+        <div class="st-item"><span id="st-lines">0 рядків</span></div>
+        <div class="st-item" style="margin-left:auto"><span style="color:var(--accent2)">tECHLAB CODE</span></div>
+      </div>
+    </div>
+
+
+    <div class="divider h" id="divider" style="display:none" onmousedown="startDividerDrag(event)"></div>
+
+    <div class="pane-output hidden" id="pane-output">
+      <div class="output-header">
+        <div class="output-tabs">
+          <div class="out-tab active" id="ot-preview" onclick="switchOutTab('preview')">ПРЕВʼЮ</div>
+          <div class="out-tab" id="ot-console" onclick="switchOutTab('console')">КОНСОЛЬ</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span id="out-status" style="font-size:9px;color:var(--wire-on)"></span>
+          <button class="btn" onclick="clearConsole()" style="padding:2px 8px;min-height:unset;font-size:9px;">ОЧИСТ</button>
+          <button class="btn" onclick="toggleOutput()" style="padding:2px 8px;min-height:unset;font-size:9px;">✕</button>
+        </div>
+      </div>
+      <iframe id="preview-frame" class="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+      <div class="console-out hidden" id="console-out"></div>
+    </div>
+
+  </div>
+</div>
+
+
+<div id="ctx-menu">
+  <div class="ctx-item" onclick="ctxCut()">Вирізати <span class="ctx-key">Ctrl+X</span></div>
+  <div class="ctx-item" onclick="ctxCopy()">Копіювати <span class="ctx-key">Ctrl+C</span></div>
+  <div class="ctx-item" onclick="ctxPaste()">Вставити <span class="ctx-key">Ctrl+V</span></div>
+  <div class="ctx-item" onclick="ctxSelectAll()">Вибрати все <span class="ctx-key">Ctrl+A</span></div>
+  <div class="ctx-item" onclick="toggleComment()">Коментар <span class="ctx-key">Ctrl+/</span></div>
+  <div class="ctx-item" onclick="duplicateLine()">Дублювати рядок <span class="ctx-key">Ctrl+D</span></div>
+  <div class="ctx-item" onclick="formatCode()">Форматувати <span class="ctx-key">Alt+F</span></div>
+</div>
+
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3>// НОВИЙ ФАЙЛ</h3>
+    <input type="text" id="modal-filename" placeholder="Назва файлу (напр. index.html)" value="index.html">
+    <select id="modal-lang">
+      <option value="html">HTML</option>
+      <option value="css">CSS</option>
+      <option value="js">JavaScript</option>
+      <option value="ts">TypeScript</option>
+      <option value="lua">Lua</option>
+      <option value="json">JSON</option>
+      <option value="md">Markdown</option>
+    </select>
+    <div class="modal-btns">
+      <button onclick="closeModal()" style="background:var(--panel2);color:var(--muted);">Скасувати</button>
+      <button onclick="createNewFile()" style="background:var(--accent);color:#000;">Створити</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+const state = {
+  files: [],
+  activeId: null,
+  themes: ['dark','light','retro','neon'],
+  themeIdx: 0,
+  splitOpen: false,
+  outTab: 'preview',
+  minimapVisible: true,
+  treeVisible: true,
+  dividerDragging: false,
+};
+
+// Templates
+const TEMPLATES = {
+  html: `<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мій проект</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #0d1b2a;
+      color: #e2f4ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 { color: #00d4ff; }
+  </style>
+</head>
+<body>
+  <h1>Привіт, tECHLAB!</h1>
+  <p>Починай кодити...</p>
+</body>
+</html>`,
+  css: `/* Стилі */
+:root {
+  --primary: #00d4ff;
+  --bg: #0d1b2a;
+  --text: #e2f4ff;
+}
+
+body {
+  font-family: sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}`,
+  js: `// tECHLAB — JavaScript
+console.log('Привіт, світ!');
+
+// Функція-приклад
+function greet(name) {
+  return \`Привіт, \${name}!\`;
+}
+
+const message = greet('tECHLAB');
+console.log(message);
+
+// Масив і цикл
+const items = [1, 2, 3, 4, 5];
+const doubled = items.map(x => x * 2);
+console.log('Подвоєні:', doubled);`,
+  ts: `// tECHLAB — TypeScript
+// (Виконується як JavaScript — типи лише для читання)
+
+interface User {
+  name: string;
+  age: number;
+  active: boolean;
+}
+
+function greet(user: User): string {
+  return \`Привіт, \${user.name}! Вік: \${user.age}\`;
+}
+
+const user: User = {
+  name: 'tECHLAB',
+  age: 1,
+  active: true,
+};
+
+console.log(greet(user));`,
+  lua: `-- tECHLAB — Lua (через Fengari у браузері)
+print("Привіт, Lua!")
+
+-- Функція
+local function greet(name)
+  return "Привіт, " .. name .. "!"
+end
+
+print(greet("tECHLAB"))
+
+-- Таблиця
+local t = {1, 2, 3, 4, 5}
+for i, v in ipairs(t) do
+  print(i, v * 2)
+end`,
+  json: `{
+  "project": "tECHLAB",
+  "version": "1.0.0",
+  "author": "Ти",
+  "description": "Мій проект",
+  "dependencies": {}
+}`,
+  md: `# tECHLAB
+
+> Код. Думай. Твори.
+
+## Початок
+
+Це **Markdown** файл. Можна писати документацію тут.
+
+### Особливості
+- Підсвітка синтаксису
+- Попередній перегляд
+- Багато мов
+
+\`\`\`js
+console.log("Hello!");
+\`\`\``
+};
+
+
+function highlight(code, lang) {
+  if (!code) return '';
+  // Escape HTML first
+  let s = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  if (lang === 'html') {
+    s = s.replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="cmt">$1</span>');
+    s = s.replace(/(&lt;\/?)([\w-]+)([^&]*?)(\/?&gt;)/g, (m,open,tag,attrs,close) => {
+      let a = attrs.replace(/([\w-]+)(=)("([^"]*)")/g, '<span class="attr">$1</span>$2<span class="str">"$4"</span>');
+      return `<span class="tag">${open}${tag}</span>${a}<span class="tag">${close}</span>`;
+    });
+  } else if (lang === 'css') {
+    s = s.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="cmt">$1</span>');
+    s = s.replace(/([.#]?[\w-]+)(\s*\{)/g, '<span class="sel">$1</span>$2');
+    s = s.replace(/([\w-]+)(\s*:\s*)([^;{}\n]+)(;)/g, '<span class="prop">$1</span>$2<span class="val">$3</span>$4');
+    s = s.replace(/(\d+)(px|em|rem|vh|vw|%|s|ms)/g, '<span class="num">$1</span><span class="unit">$2</span>');
+    s = s.replace(/(#[0-9a-fA-F]{3,6})/g, '<span class="num">$1</span>');
+  } else if (lang === 'js' || lang === 'ts') {
+    s = s.replace(/(\/\/[^\n]*)/g, '<span class="cmt">$1</span>');
+    s = s.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="cmt">$1</span>');
+    s = s.replace(/(`[^`]*`)/g, '<span class="str">$1</span>');
+    s = s.replace(/("(?:[^"\\]|\\.)*")/g, '<span class="str">$1</span>');
+    s = s.replace(/('(?:[^'\\]|\\.)*')/g, '<span class="str">$1</span>');
+    const kwds = ['const','let','var','function','return','if','else','for','while','do','class','new','this','typeof','instanceof','import','export','default','async','await','try','catch','finally','throw','switch','case','break','continue','true','false','null','undefined','void','of','in','from','extends'];
+    const kwds2 = ['interface','type','enum','namespace','declare','abstract','implements','private','public','protected','readonly','static','any','string','number','boolean','never','object'];
+    kwds.forEach(k => { s = s.replace(new RegExp(`\\b(${k})\\b(?![^<]*>)`, 'g'), '<span class="kw">$1</span>'); });
+    if(lang==='ts') kwds2.forEach(k => { s = s.replace(new RegExp(`\\b(${k})\\b`, 'g'), '<span class="kw2">$1</span>'); });
+    s = s.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="num">$1</span>');
+    s = s.replace(/\b([a-zA-Z_$][\w$]*)\s*(?=\()/g, '<span class="fn">$1</span>');
+  } else if (lang === 'lua') {
+    s = s.replace(/(--[^\n]*)/g, '<span class="cmt">$1</span>');
+    s = s.replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g, '<span class="str">$1</span>');
+    const kwds = ['and','break','do','else','elseif','end','false','for','function','goto','if','in','local','nil','not','or','repeat','return','then','true','until','while','print','require','type','tostring','tonumber','ipairs','pairs','table','string','math'];
+    kwds.forEach(k => { s = s.replace(new RegExp(`\\b(${k})\\b`, 'g'), '<span class="kw">$1</span>'); });
+    s = s.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="num">$1</span>');
+  } else if (lang === 'json') {
+    s = s.replace(/("(?:[^"\\]|\\.)*")\s*:/g, '<span class="attr">$1</span>:');
+    s = s.replace(/:\s*("(?:[^"\\]|\\.)*")/g, ': <span class="str">$1</span>');
+    s = s.replace(/\b(true|false|null)\b/g, '<span class="kw">$1</span>');
+    s = s.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="num">$1</span>');
+  }
+  return s;
+}
+
+
+let fileIdCounter = 1;
+
+function createFile(name, lang, content, activate=true) {
+  const id = fileIdCounter++;
+  const file = { id, name, lang, content: content || TEMPLATES[lang] || '', modified: false };
+  state.files.push(file);
+  renderTabs();
+  renderTree();
+  if(activate) activateFile(id);
+  return file;
+}
+
+function activateFile(id) {
+  state.activeId = id;
+  const file = getActive();
+  if(!file) return;
+  const ta = document.getElementById('main-ta');
+  ta.value = file.content;
+  renderTabs();
+  renderTree();
+  showEditor();
+  doHighlight();
+  updateLineNums();
+  updateStatus();
+  ta.focus();
+}
+
+function getActive() {
+  return state.files.find(f => f.id === state.activeId);
+}
+
+function closeFile(id) {
+  const idx = state.files.findIndex(f => f.id === id);
+  state.files = state.files.filter(f => f.id !== id);
+  if(state.activeId === id) {
+    const next = state.files[Math.min(idx, state.files.length-1)];
+    if(next) activateFile(next.id);
+    else { state.activeId = null; showWelcome(); }
+  }
+  renderTabs(); renderTree();
+}
+
+function getExtColor(lang) {
+  return {html:'ext-html',css:'ext-css',js:'ext-js',ts:'ext-ts',lua:'',json:'ext-json',md:''}[lang]||'';
+}
+
+
+function renderTabs() {
+  const bar = document.getElementById('tabs-bar');
+  bar.innerHTML = state.files.map(f => `
+    <div class="tab ${f.id===state.activeId?'active':''} ${f.modified?'modified':''}" onclick="activateFile(${f.id})">
+      <span class="dot"></span>
+      <span class="ext ${getExtColor(f.lang)}">${f.lang}</span>
+      ${f.name}
+      <span class="tab-close" onclick="event.stopPropagation();closeFile(${f.id})">✕</span>
+    </div>
+  `).join('');
+}
+
+function renderTree() {
+  const scroll = document.getElementById('tree-scroll');
+  scroll.innerHTML = state.files.map(f => `
+    <div class="tree-item ${f.id===state.activeId?'active':''}" onclick="activateFile(${f.id})">
+      <span class="ext ${getExtColor(f.lang)}" style="min-width:28px;text-align:center;">${f.lang}</span>
+      ${f.name}
+    </div>
+  `).join('');
+}
+
+function showEditor() {
+  document.getElementById('welcome-screen').style.display = 'none';
+  document.getElementById('editor-wrap').style.display = 'flex';
+}
+function showWelcome() {
+  document.getElementById('welcome-screen').style.display = '';
+  document.getElementById('editor-wrap').style.display = 'none';
+}
+
+
+function doHighlight() {
+  const file = getActive();
+  const ta = document.getElementById('main-ta');
+  const hl = document.getElementById('highlight-layer');
+  if(!file) return;
+  const code = ta.value;
+  file.content = code;
+  hl.innerHTML = highlight(code, file.lang);
+  // Sync scroll
+  hl.scrollTop = ta.scrollTop;
+  hl.scrollLeft = ta.scrollLeft;
+  updateLineNums();
+  updateStatus();
+  updateMinimap();
+  markModified();
+}
+
+function updateLineNums() {
+  const ta = document.getElementById('main-ta');
+  const ln = document.getElementById('line-nums');
+  const lines = (ta.value.match(/\n/g)||[]).length + 1;
+  ln.textContent = Array.from({length:lines},(_,i)=>i+1).join('\n');
+}
+
+function updateStatus() {
+  const ta = document.getElementById('main-ta');
+  const file = getActive();
+  if(!file) return;
+  const pos = ta.selectionStart;
+  const text = ta.value.substring(0, pos);
+  const row = (text.match(/\n/g)||[]).length + 1;
+  const col = pos - text.lastIndexOf('\n');
+  document.getElementById('st-pos').textContent = `Рядок ${row}, Стовп ${col}`;
+  document.getElementById('st-lang').textContent = file.lang.toUpperCase();
+  document.getElementById('st-chars').textContent = ta.value.length + ' симв.';
+  document.getElementById('st-lines').textContent = ((ta.value.match(/\n/g)||[]).length+1) + ' рядків';
+}
+
+function markModified() {
+  const file = getActive();
+  if(file && !file.modified) { file.modified = true; renderTabs(); }
+}
+
+// Tab handling, auto-indent
+document.addEventListener('DOMContentLoaded', () => {
+  const ta = document.getElementById('main-ta');
+  ta.addEventListener('input', doHighlight);
+  ta.addEventListener('keydown', handleEditorKey);
+  ta.addEventListener('click', updateStatus);
+  ta.addEventListener('keyup', updateStatus);
+  ta.addEventListener('scroll', () => {
+    const hl = document.getElementById('highlight-layer');
+    const ln = document.getElementById('line-nums');
+    hl.scrollTop = ta.scrollTop;
+    hl.scrollLeft = ta.scrollLeft;
+    ln.scrollTop = ta.scrollTop;
+  });
+  ta.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    const m = document.getElementById('ctx-menu');
+    m.style.display = 'block';
+    m.style.left = Math.min(e.clientX, window.innerWidth-180)+'px';
+    m.style.top = Math.min(e.clientY, window.innerHeight-200)+'px';
+  });
+  document.addEventListener('click', () => document.getElementById('ctx-menu').style.display='none');
+  document.addEventListener('keydown', handleGlobalKey);
+});
+
+function handleEditorKey(e) {
+  const ta = e.target;
+  if(e.key === 'Tab') {
+    e.preventDefault();
+    const start = ta.selectionStart, end = ta.selectionEnd;
+    ta.value = ta.value.substring(0,start) + '  ' + ta.value.substring(end);
+    ta.selectionStart = ta.selectionEnd = start + 2;
+    doHighlight();
+  }
+  if(e.key === 'Enter') {
+    e.preventDefault();
+    const start = ta.selectionStart;
+    const lineStart = ta.value.lastIndexOf('\n', start-1)+1;
+    const line = ta.value.substring(lineStart, start);
+    const indent = line.match(/^(\s*)/)[1];
+    let extra = '';
+    if(/[{(\[]\s*$/.test(line)) extra = '  ';
+    const insert = '\n' + indent + extra;
+    ta.value = ta.value.substring(0,start) + insert + ta.value.substring(ta.selectionEnd);
+    ta.selectionStart = ta.selectionEnd = start + insert.length;
+    doHighlight();
+  }
+  // Auto-close brackets
+  const pairs = {'(':')','{':'}','[':']','"':'"',"'":"'",'`':'`'};
+  if(pairs[e.key] && !e.ctrlKey && !e.metaKey) {
+    const start = ta.selectionStart, end = ta.selectionEnd;
+    if(start===end) {
+      e.preventDefault();
+      const close = pairs[e.key];
+      ta.value = ta.value.substring(0,start)+e.key+close+ta.value.substring(end);
+      ta.selectionStart = ta.selectionEnd = start+1;
+      doHighlight();
+    }
+  }
+}
+
+function handleGlobalKey(e) {
+  if(e.ctrlKey || e.metaKey) {
+    if(e.key==='s') { e.preventDefault(); saveCurrentFile(); }
+    if(e.key==='n') { e.preventDefault(); showNewFileModal(); }
+    if(e.key==='f') { e.preventDefault(); toggleSearch(); }
+    if(e.key==='Enter') { e.preventDefault(); runCode(); }
+    if(e.key==='/') { e.preventDefault(); toggleComment(); }
+    if(e.key==='d') { e.preventDefault(); duplicateLine(); }
+    if(e.key==='w') { e.preventDefault(); if(state.activeId) closeFile(state.activeId); }
+  }
+}
+
+function toggleMinimap() {
+  state.minimapVisible = !state.minimapVisible;
+  document.getElementById('minimap-pane').style.display = state.minimapVisible ? '' : 'none';
+}
+function updateMinimap() {
+  const canvas = document.getElementById('minimap-canvas');
+  const pane = document.getElementById('minimap-pane');
+  if(!pane || pane.style.display==='none') return;
+  const ta = document.getElementById('main-ta');
+  const W = 80, H = pane.offsetHeight || 400;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const style = getComputedStyle(document.body);
+  ctx.fillStyle = style.getPropertyValue('--code-bg') || '#010c14';
+  ctx.fillRect(0,0,W,H);
+  const lines = ta.value.split('\n');
+  const lh = Math.min(3, H / lines.length);
+  lines.forEach((line, i) => {
+    const y = i * lh;
+    if(line.trim()) {
+      ctx.fillStyle = style.getPropertyValue('--muted') || '#4a7a99';
+      ctx.globalAlpha = 0.6;
+      ctx.fillRect(4, y, Math.min(line.length * 0.6, W-8), Math.max(lh*0.7,1));
+    }
+  });
+  ctx.globalAlpha = 1;
+  // Viewport indicator
+  const totalLines = lines.length;
+  const visStart = Math.floor(ta.scrollTop / (ta.scrollHeight / totalLines));
+  const visHeight = Math.floor((ta.clientHeight / ta.scrollHeight) * H);
+  ctx.fillStyle = (style.getPropertyValue('--accent') || '#00d4ff') + '22';
+  ctx.fillRect(0, (visStart/totalLines)*H, W, visHeight);
+}
+
+
+function toggleSearch() {
+  const sb = document.getElementById('search-bar');
+  sb.classList.toggle('visible');
+  if(sb.classList.contains('visible')) document.getElementById('search-input').focus();
+}
+function hideSearch() {
+  document.getElementById('search-bar').classList.remove('visible');
+}
+function doSearch() {
+  const q = document.getElementById('search-input').value;
+  const ta = document.getElementById('main-ta');
+  if(!q) { document.getElementById('s-count').textContent = '0 збігів'; return; }
+  const text = ta.value;
+  let count = 0, idx = 0;
+  while((idx = text.indexOf(q, idx)) !== -1) { count++; idx += q.length; }
+  document.getElementById('s-count').textContent = count + ' збігів';
+}
+
+// ============================================================
+// CODE ACTIONS
+// ============================================================
+function toggleComment() {
+  const ta = document.getElementById('main-ta');
+  const file = getActive();
+  if(!file) return;
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const lineStart = ta.value.lastIndexOf('\n', start-1)+1;
+  const lineEnd = ta.value.indexOf('\n', end);
+  const line = ta.value.substring(lineStart, lineEnd===-1?undefined:lineEnd);
+  const prefix = {html:'<!-- ','css':'/* ','js':'// ','ts':'// ','lua':'-- ','json':'// '}[file.lang]||'// ';
+  const suffix = {html:' -->','css':' */'}[file.lang]||'';
+  let newLine;
+  if(line.trimStart().startsWith(prefix.trim())) {
+    newLine = line.replace(prefix.trim(),'').replace(suffix.trim(),'');
+  } else {
+    newLine = prefix + line + suffix;
+  }
+  ta.value = ta.value.substring(0,lineStart)+newLine+(lineEnd===-1?'':ta.value.substring(lineEnd));
+  ta.selectionStart = start; ta.selectionEnd = end;
+  doHighlight();
+}
+
+function duplicateLine() {
+  const ta = document.getElementById('main-ta');
+  const start = ta.selectionStart;
+  const lineStart = ta.value.lastIndexOf('\n', start-1)+1;
+  const lineEnd = ta.value.indexOf('\n', start);
+  const line = ta.value.substring(lineStart, lineEnd===-1?undefined:lineEnd);
+  const insert = '\n' + line;
+  const insertAt = lineEnd===-1?ta.value.length:lineEnd;
+  ta.value = ta.value.substring(0,insertAt)+insert+ta.value.substring(insertAt);
+  ta.selectionStart = ta.selectionEnd = start+insert.length;
+  doHighlight();
+}
+
+function formatCode() {
+  const ta = document.getElementById('main-ta');
+  const file = getActive();
+  if(!file) return;
+  let code = ta.value;
+  if(file.lang === 'json') {
+    try { code = JSON.stringify(JSON.parse(code), null, 2); } catch(e) { logLine('err', 'JSON помилка: '+e.message); }
+  }
+  ta.value = code;
+  doHighlight();
+  logLine('ok', 'Код відформатовано');
+}
+
+// ============================================================
+// RUN CODE
+// ============================================================
+function runCode() {
+  const file = getActive();
+  if(!file) { logLine('err','Немає відкритого файлу'); return; }
+  openOutput();
+  const dot = document.getElementById('run-dot');
+  const status = document.getElementById('run-status');
+  dot.classList.add('on'); status.textContent = 'ВИКОНАННЯ...';
+  setTimeout(() => { dot.classList.remove('on'); status.textContent = 'ГОТОВО'; }, 1500);
+
+  if(file.lang === 'html') {
+    runHTML(file.content);
+  } else if(file.lang === 'css') {
+    runCSS(file.content);
+  } else if(file.lang === 'js' || file.lang === 'ts') {
+    runJS(file.content, file.lang);
+  } else if(file.lang === 'lua') {
+    runLua(file.content);
+  } else if(file.lang === 'json') {
+    validateJSON(file.content);
+  } else {
+    logLine('warn', 'Виконання '+file.lang+' не підтримується в браузері');
+  }
+}
+
+function runHTML(code) {
+  switchOutTab('preview');
+  const frame = document.getElementById('preview-frame');
+  const doc = frame.contentDocument || frame.contentWindow.document;
+  doc.open(); doc.write(code); doc.close();
+  document.getElementById('out-status').textContent = '✅ HTML';
+  logLine('ok', 'HTML сторінка завантажена');
+}
+
+function runCSS(css) {
+  switchOutTab('preview');
+  const html = `<!DOCTYPE html><html><head><style>body{background:#1a1a2e;color:#e2f4ff;font-family:sans-serif;padding:20px;}${css}</style></head><body><h2 style="color:#00d4ff">CSS Превʼю</h2><p>Стилі застосовано до цієї сторінки.</p><div class="container"><div class="box">Тестовий блок</div></div></body></html>`;
+  const frame = document.getElementById('preview-frame');
+  const doc = frame.contentDocument || frame.contentWindow.document;
+  doc.open(); doc.write(html); doc.close();
+  logLine('ok', 'CSS відрендерено');
+}
+
+function runJS(code, lang) {
+  switchOutTab('console');
+  clearConsole();
+  logLine('info', `▶ Запуск ${lang.toUpperCase()}...`);
+  // Patch console
+  const frame = document.getElementById('preview-frame');
+  const doc = frame.contentDocument;
+  const src = `
+    <html><head></head><body><script>
+    (function(){
+      const _log = function(...a){ window.parent.postMessage({type:'log',args:a.map(String)},'*'); };
+      const _err = function(...a){ window.parent.postMessage({type:'error',args:a.map(String)},'*'); };
+      const _warn = function(...a){ window.parent.postMessage({type:'warn',args:a.map(String)},'*'); };
+      window.console = {log:_log,error:_err,warn:_warn,info:_log,dir:_log};
+      window.onerror = function(msg,src,line,col,err){ _err('Помилка рядок '+line+': '+msg); };
+      try {
+        ${lang==='ts' ? stripTS(code) : code}
+      } catch(e){ _err(e.toString()); }
+    })();
+    <\/script></body></html>`;
+  doc.open(); doc.write(src); doc.close();
+}
+
+function stripTS(code) {
+  // Very basic TS stripping - remove type annotations
+  return code
+    .replace(/:\s*(string|number|boolean|any|void|never|object|unknown|null|undefined|[\w<>[\]|&,\s]+)(?=[,;){\n=])/g,'')
+    .replace(/interface\s+\w+\s*\{[^}]*\}/g,'')
+    .replace(/<[\w,\s]+>/g,'')
+    .replace(/^(export\s+)?type\s+.*$/gm,'')
+    .replace(/^(export\s+)?enum\s+\w+\s*\{[^}]*\}/gm,'');
+}
+
+function runLua(code) {
+  switchOutTab('console');
+  clearConsole();
+  logLine('info', '▶ Lua через Fengari...');
+  // Load fengari dynamically
+  if(window.fengari) {
+    execLua(code);
+  } else {
+    const sc = document.createElement('script');
+    sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/fengari/0.1.4/fengari-web.js';
+    sc.onload = () => { logLine('info', 'Fengari завантажено'); setTimeout(()=>execLua(code),200); };
+    sc.onerror = () => { logLine('err', 'Не вдалося завантажити Fengari. Перевірте підключення до інтернету.'); };
+    document.head.appendChild(sc);
+  }
+}
+
+function execLua(code) {
+  try {
+    const { lua, lauxlib, lualib } = fengari;
+    const L = lauxlib.luaL_newstate();
+    lualib.luaL_openlibs(L);
+    // Override print
+    const printFn = (lst) => {
+      const out = [];
+      for(let i=1;i<=lua.lua_gettop(lst);i++) out.push(lua.lua_tojsstring(lst,i));
+      logLine('log', out.join('\t'));
+      return 0;
+    };
+    lua.lua_pushcclosure(L, printFn, 0);
+    lua.lua_setglobal(L, lua.to_luastring('print'));
+    const r = lauxlib.luaL_dostring(L, lua.to_luastring(code));
+    if(r!==0) logLine('err', lua.lua_tojsstring(L,-1)||'Lua помилка');
+    else logLine('ok', '✅ Lua виконано');
+  } catch(e) {
+    logLine('err', 'Lua помилка: '+e.message);
+  }
+}
+
+function validateJSON(code) {
+  switchOutTab('console');
+  try {
+    const parsed = JSON.parse(code);
+    logLine('ok', '✅ JSON валідний');
+    logLine('log', JSON.stringify(parsed, null, 2));
+  } catch(e) {
+    logLine('err', '❌ JSON помилка: '+e.message);
+  }
+}
+
+// Receive messages from iframe
+window.addEventListener('message', e => {
+  if(e.data && e.data.type) {
+    const typeMap = {log:'log', error:'err', warn:'warn'};
+    logLine(typeMap[e.data.type]||'log', (e.data.args||[]).join(' '));
+  }
+});
+
+
+function logLine(type, text) {
+  const c = document.getElementById('console-out');
+  const line = document.createElement('div');
+  line.className = 'log-line ' + type;
+  const prefix = {log:'LOG ',err:'ERR ',warn:'WRN ',info:'INF ',ok:' OK '}[type]||'    ';
+  line.innerHTML = `<span class="log-prefix">[${prefix}]</span>${escHtml(text)}`;
+  c.appendChild(line);
+  c.scrollTop = c.scrollHeight;
+}
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function clearConsole() { document.getElementById('console-out').innerHTML = ''; }
+
+
+function openOutput() {
+  const pane = document.getElementById('pane-output');
+  const div = document.getElementById('divider');
+  pane.classList.remove('hidden');
+  div.style.display = '';
+  state.splitOpen = true;
+}
+function toggleOutput() {
+  const pane = document.getElementById('pane-output');
+  const div = document.getElementById('divider');
+  const hidden = pane.classList.toggle('hidden');
+  div.style.display = hidden ? 'none' : '';
+  state.splitOpen = !hidden;
+}
+function switchOutTab(tab) {
+  state.outTab = tab;
+  document.getElementById('preview-frame').classList.toggle('hidden', tab!=='preview');
+  document.getElementById('console-out').classList.toggle('hidden', tab!=='console');
+  document.getElementById('ot-preview').classList.toggle('active', tab==='preview');
+  document.getElementById('ot-console').classList.toggle('active', tab==='console');
+  openOutput();
+}
+
+
+function startDividerDrag(e) {
+  e.preventDefault();
+  const div = document.getElementById('divider');
+  div.classList.add('dragging');
+  const split = document.getElementById('split-area');
+  const onMove = mv => {
+    const rect = split.getBoundingClientRect();
+    const ratio = Math.min(0.85, Math.max(0.15, (mv.clientX-rect.left)/rect.width));
+    document.getElementById('pane-editor').style.flex = `0 0 ${ratio*100}%`;
+    document.getElementById('pane-output').style.flex = `0 0 ${(1-ratio)*100}%`;
+  };
+  const onUp = () => {
+    div.classList.remove('dragging');
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+
+function showNewFileModal() {
+  document.getElementById('modal-overlay').classList.add('visible');
+  document.getElementById('modal-filename').focus();
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('visible'); }
+function createNewFile() {
+  const name = document.getElementById('modal-filename').value.trim() || 'untitled';
+  const lang = document.getElementById('modal-lang').value;
+  closeModal();
+  createFile(name, lang);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('modal-filename').addEventListener('keydown', e => {
+    if(e.key==='Enter') createNewFile();
+    // auto-detect lang from extension
+    if(e.key !== 'Enter') {
+      const name = e.target.value + e.key;
+      const ext = name.split('.').pop().toLowerCase();
+      const langMap = {html:'html',css:'css',js:'js',ts:'ts',lua:'lua',json:'json',md:'md'};
+      if(langMap[ext]) document.getElementById('modal-lang').value = langMap[ext];
+    }
+  });
+  document.getElementById('modal-filename').addEventListener('input', e => {
+    const ext = e.target.value.split('.').pop().toLowerCase();
+    const langMap = {html:'html',css:'css',js:'js',ts:'ts',lua:'lua',json:'json',md:'md'};
+    if(langMap[ext]) document.getElementById('modal-lang').value = langMap[ext];
+  });
+  document.getElementById('modal-overlay').addEventListener('click', e => {
+    if(e.target === document.getElementById('modal-overlay')) closeModal();
+  });
+});
+
+function newFileTemplate(lang) {
+  const ext = {html:'html',css:'css',js:'js',ts:'ts',lua:'lua',json:'json',md:'md'}[lang]||'txt';
+  const name = 'untitled.'+ext;
+  createFile(name, lang);
+}
+
+function saveCurrentFile() {
+  const file = getActive();
+  if(!file) return;
+  file.content = document.getElementById('main-ta').value;
+  file.modified = false;
+  renderTabs();
+  try { localStorage.setItem('techlab_code_'+file.id, JSON.stringify(file)); } catch(e){}
+  logLine('ok', `Збережено: ${file.name}`);
+  // Also save to LS
+  autoSave();
+}
+
+function autoSave() {
+  try {
+    localStorage.setItem('techlab_code_state', JSON.stringify({
+      files: state.files.map(f => ({...f, content: (f.id===state.activeId?document.getElementById('main-ta').value:f.content)})),
+      activeId: state.activeId
+    }));
+  } catch(e){}
+}
+
+function exportFile() {
+  const file = getActive();
+  if(!file) return;
+  const content = document.getElementById('main-ta').value;
+  const a = document.createElement('a');
+  a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
+  a.download = file.name;
+  a.click();
+}
+
+function openFile() { document.getElementById('open-file-input').click(); }
+function doOpenFile(e) {
+  const f = e.target.files[0]; if(!f) return;
+  const ext = f.name.split('.').pop().toLowerCase();
+  const langMap = {html:'html',css:'css',js:'js',ts:'ts',lua:'lua',json:'json',md:'md'};
+  const lang = langMap[ext] || 'js';
+  const reader = new FileReader();
+  reader.onload = ev => createFile(f.name, lang, ev.target.result);
+  reader.readAsText(f);
+  e.target.value = '';
+}
+
+function ctxCut() { document.execCommand('cut'); }
+function ctxCopy() { document.execCommand('copy'); }
+function ctxPaste() { document.getElementById('main-ta').focus(); document.execCommand('paste'); }
+function ctxSelectAll() { const ta = document.getElementById('main-ta'); ta.select(); }
+
+
+function toggleSplit() {
+  toggleOutput();
+  const btn = document.getElementById('btn-split');
+  btn.classList.toggle('active', state.splitOpen);
+}
+function toggleTree() {
+  const tree = document.getElementById('file-tree');
+  state.treeVisible = !state.treeVisible;
+  tree.classList.toggle('collapsed', !state.treeVisible);
+  document.getElementById('btn-tree').classList.toggle('active', state.treeVisible);
+}
+
+
+function cycleTheme() {
+  state.themeIdx = (state.themeIdx+1) % state.themes.length;
+  document.body.dataset.theme = state.themes[state.themeIdx]==='dark'?'':state.themes[state.themeIdx];
+  updateMinimap();
+}
+
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('techlab_code_state')||'{}');
+    if(saved.files && saved.files.length > 0) {
+      saved.files.forEach(f => {
+        const file = { ...f };
+        file.modified = false;
+        state.files.push(file);
+        fileIdCounter = Math.max(fileIdCounter, f.id+1);
+      });
+      renderTabs(); renderTree();
+      const active = saved.files.find(f=>f.id===saved.activeId) || saved.files[0];
+      if(active) activateFile(active.id);
+      return true;
+    }
+  } catch(e){}
+  return false;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if(!loadState()) {
+ 
+    createFile('index.html', 'html', TEMPLATES.html);
+  }
+
+  document.getElementById('btn-tree').classList.add('active');
+  updateMinimap();
+
+  document.getElementById('main-ta').addEventListener('input', autoSave);
+});
+
+window.addEventListener('beforeunload', autoSave);
+</script>
+</body>
+</html>
